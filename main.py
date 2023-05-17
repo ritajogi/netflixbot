@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-from telegram import Update
+from telegram import Update, InputMediaPhoto, ParseMode
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 def scrape_netflix_posters(url):
@@ -39,15 +39,24 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text("Welcome to the Netflix Poster Bot! Use /posters to get Netflix posters.")
 
 def get_posters(update: Update, context: CallbackContext):
-    netflix_url = 'https://www.netflix.com/browse/genre/839338'
+    netflix_url = 'https://www.netflix.com/in/browse/genre/839338'
     posters = scrape_netflix_posters(netflix_url)
     folder = 'netflix_posters'
     file_paths = download_posters(posters, folder)
 
     chat_id = update.message.chat_id
+    media = []
     for file_path in file_paths:
-        with open(file_path, 'rb') as file:
-            context.bot.send_photo(chat_id, photo=file)
+        media.append(InputMediaPhoto(open(file_path, 'rb')))
+
+    context.bot.send_media_group(chat_id, media)
+
+    # Cleanup: Delete the downloaded posters
+    for file_path in file_paths:
+        os.remove(file_path)
+
+    # Remove the temporary folder
+    os.rmdir(folder)
 
 def main():
     # Telegram bot token
