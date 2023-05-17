@@ -8,11 +8,11 @@ def scrape_netflix_posters(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    posters = soup.find_all('img', {'class': 'boxart-image boxart-image-in-padded-container'})
+    posters = soup.find_all('div', {'class': 'slider-item'})
     poster_urls = []
 
     for poster in posters:
-        poster_url = poster['src']
+        poster_url = poster.find('img')['src']
         poster_urls.append(poster_url)
 
     return poster_urls
@@ -39,7 +39,7 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text("Welcome to the Netflix Poster Bot! Use /posters to get Netflix posters.")
 
 def get_posters(update: Update, context: CallbackContext):
-    netflix_url = 'https://www.netflix.com/in/browse/genre/839338'
+    netflix_url = 'https://www.netflix.com/us/title/80994666'
     posters = scrape_netflix_posters(netflix_url)
     folder = 'netflix_posters'
     file_paths = download_posters(posters, folder)
