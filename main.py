@@ -53,7 +53,7 @@ def fetch_poster_image(netflix_id, build_identifier):
 
 def main():
     # Initialize the Telegram bot
-    updater = Updater(token='6206338404:AAFQWpUemVDNSW6P1b6o90tfZoh--aG0qZA', use_context=True)
+    updater = Updater(token='6206338404:AAHB41h-5oYWawSc9I7HtQZOQHox6JLibsg', use_context=True)
     dispatcher = updater.dispatcher
 
     # Add command handlers
