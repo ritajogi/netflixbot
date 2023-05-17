@@ -45,18 +45,23 @@ def get_posters(update: Update, context: CallbackContext):
     file_paths = download_posters(posters, folder)
 
     chat_id = update.message.chat_id
-    media = []
-    for file_path in file_paths:
-        media.append(InputMediaPhoto(open(file_path, 'rb')))
 
-    context.bot.send_media_group(chat_id, media)
+    if file_paths:
+        media = []
+        for file_path in file_paths:
+            media.append(InputMediaPhoto(open(file_path, 'rb')))
 
-    # Cleanup: Delete the downloaded posters
-    for file_path in file_paths:
-        os.remove(file_path)
+        context.bot.send_media_group(chat_id, media)
 
-    # Remove the temporary folder
-    os.rmdir(folder)
+        # Cleanup: Delete the downloaded posters
+        for file_path in file_paths:
+            os.remove(file_path)
+
+        # Remove the temporary folder
+        os.rmdir(folder)
+    else:
+        update.message.reply_text("No Netflix posters found.")
+
 
 def main():
     # Telegram bot token
