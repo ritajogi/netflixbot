@@ -5,7 +5,7 @@ from telegram.ext import Updater, CommandHandler
 
 
 def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome to the Netflix Image Scraper Bot! Send me a Netflix URL and I will scrape the image for you.")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome to the Netflix Image Scraper Bot! Send me a Netflix URL and I will scrape the poster image for you.")
 
 
 def scrape_image(update, context):
@@ -16,7 +16,7 @@ def scrape_image(update, context):
     soup = BeautifulSoup(response.content, 'html.parser')
 
     # Find the image tag in the HTML
-    image_tag = soup.find('img', {'class': 'logo'})
+    image_tag = soup.find('img', {'class': 'poster'})
 
     if image_tag:
         image_url = image_tag['src']
@@ -24,7 +24,7 @@ def scrape_image(update, context):
         # Send the image as a reply
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=image_url)
     else:
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I couldn't find the Netflix image on the provided URL.")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I couldn't find the Netflix poster image on the provided URL.")
 
 
 def main():
@@ -36,7 +36,7 @@ def main():
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
 
-    scrape_image_handler = CommandHandler('scrape_image', scrape_image)
+    scrape_image_handler = CommandHandler('scrape', scrape_image)
     dispatcher.add_handler(scrape_image_handler)
 
     # Start the bot
