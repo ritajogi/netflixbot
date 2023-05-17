@@ -16,7 +16,7 @@ def scrape_image(update, context):
     soup = BeautifulSoup(response.content, 'html.parser')
 
     # Find the image tag in the HTML
-    image_tag = soup.find('img', {'class': 'hero-image'})
+    image_tag = soup.find('img', {'class': 'hero-image hero-image-desktop'})
 
     if image_tag:
         image_url = image_tag['src']
