@@ -39,7 +39,7 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text("Welcome to the Netflix Poster Bot! Use /posters to get Netflix posters.")
 
 def get_posters(update: Update, context: CallbackContext):
-    netflix_url = 'https://www.netflix.com/in/browse/genre/839338'
+    netflix_url = 'https://www.netflix.com/pk/title/80192098'
     posters = scrape_netflix_posters(netflix_url)
     folder = 'netflix_posters'
     file_paths = download_posters(posters, folder)
