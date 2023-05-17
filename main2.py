@@ -27,13 +27,14 @@ def scrape_data(update, context):
 
     o["about"] = soup.find("div", {"class": "hook-text"}).text
 
-    episodes = soup.find("ol", {"class": "episodes-container"}).find_all("li")
-
-    for i in range(0, len(episodes)):
-        e["episode-title"] = episodes[i].find("h3", {"class": "episode-title"}).text
-        e["episode-description"] = episodes[i].find("p", {"class": "episode-synopsis"}).text
-        l.append(e)
-        e = {}
+    episodes_container = soup.find("ol", {"class": "episodes-container"})
+    if episodes_container:
+        episodes = episodes_container.find_all("li")
+        for i in range(0, len(episodes)):
+            e["episode-title"] = episodes[i].find("h3", {"class": "episode-title"}).text
+            e["episode-description"] = episodes[i].find("p", {"class": "episode-synopsis"}).text
+            l.append(e)
+            e = {}
 
     genres = soup.find_all("span", {"class": "item-genres"})
     for x in range(0, len(genres)):
