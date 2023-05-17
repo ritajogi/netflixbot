@@ -1,80 +1,48 @@
 import requests
 from bs4 import BeautifulSoup
-import os
-from telegram import Update, InputMediaPhoto, ParseMode
-from telegram.ext import Updater, CommandHandler, CallbackContext
+import telegram
+from telegram.ext import Updater, CommandHandler
 
-def scrape_netflix_posters(url):
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Welcome to the Netflix Image Scraper Bot! Send me a Netflix URL and I will scrape the image for you.")
+
+
+def scrape_image(update, context):
+    url = update.message.text.split()[1]
+
+    # Send a GET request to the Netflix URL and parse the HTML content
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    posters = soup.find_all('div', {'class': 'slider-item'})
-    poster_urls = []
+    # Find the image tag in the HTML
+    image_tag = soup.find('img', {'class': 'logo'})
 
-    for poster in posters:
-        poster_url = poster.find('img')['src']
-        poster_urls.append(poster_url)
+    if image_tag:
+        image_url = image_tag['src']
 
-    return poster_urls
-
-def download_posters(poster_urls, folder):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-
-    file_paths = []
-
-    for i, url in enumerate(poster_urls):
-        response = requests.get(url)
-        file_name = f"poster_{i}.jpg"
-        file_path = os.path.join(folder, file_name)
-
-        with open(file_path, 'wb') as file:
-            file.write(response.content)
-
-        file_paths.append(file_path)
-
-    return file_paths
-
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Welcome to the Netflix Poster Bot! Use /posters to get Netflix posters.")
-
-def get_posters(update: Update, context: CallbackContext):
-    netflix_url = 'https://www.netflix.com/us/title/80994666'
-    posters = scrape_netflix_posters(netflix_url)
-    folder = 'netflix_posters'
-    file_paths = download_posters(posters, folder)
-
-    chat_id = update.message.chat_id
-
-    if file_paths:
-        media = []
-        for file_path in file_paths:
-            media.append(InputMediaPhoto(open(file_path, 'rb')))
-
-        context.bot.send_media_group(chat_id, media)
-
-        # Cleanup: Delete the downloaded posters
-        for file_path in file_paths:
-            os.remove(file_path)
-
-        # Remove the temporary folder
-        os.rmdir(folder)
+        # Send the image as a reply
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=image_url)
     else:
-        update.message.reply_text("No Netflix posters found.")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I couldn't find the Netflix image on the provided URL.")
 
 
 def main():
-    # Telegram bot token
-    token = '6206338404:AAFQWpUemVDNSW6P1b6o90tfZoh--aG0qZA'
+    # Initialize the Telegram bot
+    updater = Updater(token='6206338404:AAFQWpUemVDNSW6P1b6o90tfZoh--aG0qZA', use_context=True)
+    dispatcher = updater.dispatcher
 
-    updater = Updater(token, use_context=True)
-    dp = updater.dispatcher
+    # Add command handlers
+    start_handler = CommandHandler('start', start)
+    dispatcher.add_handler(start_handler)
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("posters", get_posters))
+    scrape_image_handler = CommandHandler('scrape_image', scrape_image)
+    dispatcher.add_handler(scrape_image_handler)
 
+    # Start the bot
     updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
