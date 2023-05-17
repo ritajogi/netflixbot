@@ -48,10 +48,6 @@ def scrape_data(update, context):
         l.append(m)
         m = {}
 
-    o["facebook"] = soup.find("a", {"data-uia": "social-link-facebook"}).get("href")
-    o["twitter"] = soup.find("a", {"data-uia": "social-link-twitter"}).get("href")
-    o["instagram"] = soup.find("a", {"data-uia": "social-link-instagram"}).get("href")
-
     cast = soup.find_all("span", {"class": "item-cast"})
     for t in range(0, len(cast)):
         c["cast"] = cast[t].text
